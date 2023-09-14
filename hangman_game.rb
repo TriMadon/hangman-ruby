@@ -3,6 +3,8 @@
 require './word'
 
 class HangmanGame
+  DICTIONARY_FILE = 'dictionary.txt'
+
   def initialize
     @dictionary = load_dictionary
     @chosen_word = Word.new(random_word)
@@ -10,11 +12,15 @@ class HangmanGame
     @incorrect_letters = []
   end
 
+  def start
+    # starting logic here
+  end
+
   private
 
   def load_dictionary
     # loads the .txt dictionary into memory
-    ['word1', 'word2', 'word3']
+    IO.readlines(DICTIONARY_FILE, chomp: true)
   end
 
   def random_word
