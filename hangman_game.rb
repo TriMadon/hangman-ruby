@@ -19,7 +19,6 @@ class HangmanGame
   def start
     puts "let's get started!"
     @secret_word = Word.new(random_word)
-    puts @secret_word.value
     @rem_incorr_guesses = 7
     @chosen_letters = {}
     main_loop
@@ -44,7 +43,7 @@ class HangmanGame
     until input_is_valid?(input)
       input = gets.chomp.gsub(/\s+/, '').downcase
 
-      puts 'Invalid input. Please enter a letter (or full word if you know it)...' unless input_is_valid?(input)
+      puts 'Invalid input. Please enter a new letter (or full word if you know it)...' unless input_is_valid?(input)
     end
     input
   end
@@ -52,6 +51,7 @@ class HangmanGame
   def input_is_valid?(input)
     return false unless input.length == 1 || input.length == @secret_word.length
     return false unless input =~ /\A[a-z]+\z/
+    return false if @chosen_letters.keys.include?(input)
 
     true
   end

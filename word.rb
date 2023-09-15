@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Word
-  attr_reader :value
-
   def initialize(string = '')
     @value = string
     @revealed_letters = []
