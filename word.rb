@@ -3,6 +3,10 @@
 class Word
   def initialize(string = '')
     @value = string
-    @shown_letters = []
+    @revealed_letters = []
+  end
+
+  def to_s
+    @value.split('').map { |let| @revealed_letters.include?(let) ? let : '_' }.join(' ')
   end
 end

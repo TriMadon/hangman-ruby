@@ -13,7 +13,7 @@ class HangmanGame
     @rem_incorr_guesses = nil
     @incorrect_letters = nil
 
-    welcome_message
+    puts welcome_message
   end
 
   def start
@@ -21,9 +21,18 @@ class HangmanGame
     @chosen_word = Word.new(random_word)
     @rem_incorr_guesses = 7
     @incorrect_letters = []
+    main_loop
   end
 
-  private
+  def main_loop
+    until @rem_incorr_guesses.zero? # || @chosen_word.completed?
+      play_a_turn
+    end
+  end
+
+  def play_a_turn
+    puts game_stats
+  end
 
   def welcome_message
     puts '╔════════════════════════════════════════════════╗'
@@ -42,6 +51,12 @@ class HangmanGame
     4. If you guess a correct letter, it will be revealed in the word.
     5. If you guess an incorrect letter, it will be added to your incorrect letters.
     INSTRUCTIONS
+  end
+
+  def game_stats
+    puts "\nIncorrect Guesses Remaining: #{@rem_incorr_guesses}"
+    puts "incorrect Letters: #{@incorrect_letters}" unless @incorrect_letters.empty?
+    puts "\nWord: #{@chosen_word}"
   end
 
   def load_dictionary
