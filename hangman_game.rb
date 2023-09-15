@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require './word'
+require 'io/console'
 
 class HangmanGame
   DICTIONARY_FILE = 'dictionary.txt'
@@ -9,21 +10,63 @@ class HangmanGame
 
   def initialize
     @dictionary = load_dictionary
-    @chosen_word = nil
+    @secret_word = nil
     @rem_incorr_guesses = nil
-    @incorrect_letters = nil
+    @chosen_letters = nil
 
-    welcome_message
+    puts welcome_message
   end
 
   def start
     puts "let's get started!"
-    @chosen_word = Word.new(random_word)
+    @secret_word = Word.new(random_word)
     @rem_incorr_guesses = 7
-    @incorrect_letters = []
+    @chosen_letters = {}
+    main_loop
+    puts @secret_word.completed? ? win_message : loss_message
   end
 
-  private
+  def main_loop
+    until @rem_incorr_guesses.zero? || @secret_word.completed?
+      play_a_turn
+    end
+  end
+
+  def play_a_turn
+    puts game_stats
+    user_input = prompt_user_for_guess
+    process_input(user_input)
+    $stdout.clear_screen
+  end
+
+  def prompt_user_for_guess
+    puts "\nEnter your guess (letter or word): "
+    input = ''
+    until input_is_valid?(input)
+      input = gets.chomp.gsub(/\s+/, '').downcase
+
+      puts 'Invalid input. Please enter a new letter (or full word if you know it)...' unless input_is_valid?(input)
+    end
+    input
+  end
+
+  def input_is_valid?(input)
+    return false unless input.length == 1 || input.length == @secret_word.length
+    return false unless input =~ /\A[a-z]+\z/
+    return false if @chosen_letters.keys.include?(input)
+
+    true
+  end
+
+  def process_input(input)
+    if input.length == 1
+      letter_exists = @secret_word.letter_exists?(input)
+      @chosen_letters[input] = letter_exists
+      letter_exists ? @secret_word.reveal_letter(input) : @rem_incorr_guesses -= 1
+    else
+      @secret_word.matches?(input) ? @secret_word.reveal_fully : @rem_incorr_guesses -= 1
+    end
+  end
 
   def welcome_message
     puts '╔════════════════════════════════════════════════╗'
@@ -42,6 +85,22 @@ class HangmanGame
     4. If you guess a correct letter, it will be revealed in the word.
     5. If you guess an incorrect letter, it will be added to your incorrect letters.
     INSTRUCTIONS
+  end
+
+  def game_stats
+    puts "\nIncorrect Guesses Remaining: #{@rem_incorr_guesses}"
+    incorrect_letters = @chosen_letters.select { |_, exists| exists == false }.keys
+    puts "incorrect Letters: #{incorrect_letters.join(' ')}" unless incorrect_letters.empty?
+    puts "\nWord: #{@secret_word}"
+  end
+
+  def win_message
+    "\nCongratulations! You've guessed the word correctly. It is \"#{@secret_word}\"."
+  end
+
+  def loss_message
+    @secret_word.reveal_fully
+    "\nOut of incorrect guesses! You lost. The word was \"#{@secret_word}\"."
   end
 
   def load_dictionary
