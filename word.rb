@@ -17,12 +17,15 @@ class Word
   end
 
   def completed?
-    @value.each_char { |letter| return false unless @revealed_letters.include?(letter) }
-    true
+    (@value.split('') - @revealed_letters).empty?
   end
 
-  def reveal
+  def reveal_fully
     @revealed_letters = @value.split('').uniq
+  end
+
+  def matches?(string)
+    @value == string
   end
 
   def letter_already_revealed?(letter)

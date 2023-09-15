@@ -19,6 +19,7 @@ class HangmanGame
   def start
     puts "let's get started!"
     @secret_word = Word.new(random_word)
+    puts @secret_word.value
     @rem_incorr_guesses = 7
     @chosen_letters = {}
     main_loop
@@ -60,6 +61,8 @@ class HangmanGame
       letter_exists = @secret_word.letter_exists?(input)
       @chosen_letters[input] = letter_exists
       letter_exists ? @secret_word.reveal_letter(input) : @rem_incorr_guesses -= 1
+    else
+      @secret_word.matches?(input) ? @secret_word.reveal_fully : @rem_incorr_guesses -= 1
     end
   end
 
@@ -90,12 +93,12 @@ class HangmanGame
   end
 
   def win_message
-    "\nCongratulations! You've guessed the word correctly. It is \"#{@secret_word}.\""
+    "\nCongratulations! You've guessed the word correctly. It is \"#{@secret_word}\"."
   end
 
   def loss_message
-    @secret_word.reveal
-    "\nOut of guesses! You lost. The word was \"#{@secret_word}.\""
+    @secret_word.reveal_fully
+    "\nOut of incorrect guesses! You lost. The word was \"#{@secret_word}\"."
   end
 
   def load_dictionary
