@@ -6,6 +6,10 @@ class Word
     @revealed_letters = []
   end
 
+  def length
+    @value.length
+  end
+
   def to_s
     @value.split('').map { |let| @revealed_letters.include?(let) ? let : '_' }.join(' ')
   end

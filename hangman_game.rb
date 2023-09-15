@@ -9,19 +9,20 @@ class HangmanGame
 
   def initialize
     @dictionary = load_dictionary
-    @chosen_word = nil
+    @secret_word = nil
     @rem_incorr_guesses = nil
-    @incorrect_letters = nil
+    @chosen_letters = nil
 
     puts welcome_message
   end
 
   def start
     puts "let's get started!"
-    @chosen_word = Word.new(random_word)
+    @secret_word = Word.new(random_word)
     @rem_incorr_guesses = 7
-    @incorrect_letters = []
+    @chosen_letters = {}
     main_loop
+    @secret_word.completed? ? win_message : loss_message
   end
 
   def main_loop
@@ -32,6 +33,25 @@ class HangmanGame
 
   def play_a_turn
     puts game_stats
+    user_input = prompt_user_for_guess
+  end
+
+  def prompt_user_for_guess
+    puts "\nEnter your guess (letter or word): "
+    input = ''
+    until input_is_valid?(input)
+      input = gets.chomp.gsub(/\s+/, '').downcase
+
+      puts 'Invalid input. Please enter a letter (or full word if you know it)...' unless input_is_valid?
+    end
+    input
+  end
+
+  def input_is_valid?(input)
+    return false unless input.length == 1 || input.length == @secret_word.length
+    return false unless input =~ /\A[a-z]+\z/
+
+    true
   end
 
   def welcome_message
@@ -55,8 +75,8 @@ class HangmanGame
 
   def game_stats
     puts "\nIncorrect Guesses Remaining: #{@rem_incorr_guesses}"
-    puts "incorrect Letters: #{@incorrect_letters}" unless @incorrect_letters.empty?
-    puts "\nWord: #{@chosen_word}"
+    puts "incorrect Letters: #{@chosen_letters}" unless @chosen_letters.empty?
+    puts "\nWord: #{@secret_word}"
   end
 
   def load_dictionary
