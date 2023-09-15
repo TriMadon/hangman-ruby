@@ -22,11 +22,11 @@ class HangmanGame
     @rem_incorr_guesses = 7
     @chosen_letters = {}
     main_loop
-    @secret_word.completed? ? win_message : loss_message
+    puts @secret_word.completed? ? win_message : loss_message
   end
 
   def main_loop
-    until @rem_incorr_guesses.zero? # || @chosen_word.completed?
+    until @rem_incorr_guesses.zero? || @secret_word.completed?
       play_a_turn
     end
   end
@@ -34,6 +34,7 @@ class HangmanGame
   def play_a_turn
     puts game_stats
     user_input = prompt_user_for_guess
+    process_input(user_input)
   end
 
   def prompt_user_for_guess
@@ -42,7 +43,7 @@ class HangmanGame
     until input_is_valid?(input)
       input = gets.chomp.gsub(/\s+/, '').downcase
 
-      puts 'Invalid input. Please enter a letter (or full word if you know it)...' unless input_is_valid?
+      puts 'Invalid input. Please enter a letter (or full word if you know it)...' unless input_is_valid?(input)
     end
     input
   end
@@ -52,6 +53,14 @@ class HangmanGame
     return false unless input =~ /\A[a-z]+\z/
 
     true
+  end
+
+  def process_input(input)
+    if input.length == 1
+      letter_exists = @secret_word.letter_exists?(input)
+      @chosen_letters[input] = letter_exists
+      letter_exists ? @secret_word.reveal_letter(input) : @rem_incorr_guesses -= 1
+    end
   end
 
   def welcome_message
@@ -75,8 +84,18 @@ class HangmanGame
 
   def game_stats
     puts "\nIncorrect Guesses Remaining: #{@rem_incorr_guesses}"
-    puts "incorrect Letters: #{@chosen_letters}" unless @chosen_letters.empty?
+    incorrect_letters = @chosen_letters.select { |_, exists| exists == false }.keys
+    puts "incorrect Letters: #{incorrect_letters.join(' ')}" unless incorrect_letters.empty?
     puts "\nWord: #{@secret_word}"
+  end
+
+  def win_message
+    "\nCongratulations! You've guessed the word correctly. It is \"#{@secret_word}.\""
+  end
+
+  def loss_message
+    @secret_word.reveal
+    "\nOut of guesses! You lost. The word was \"#{@secret_word}.\""
   end
 
   def load_dictionary
