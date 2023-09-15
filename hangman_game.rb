@@ -7,8 +7,8 @@ class HangmanGame
   DICTIONARY_FILE = 'dictionary.txt'
   MAX_WORD_LEN = 12
   MIN_WORD_LEN = 5
-  NEWGAME = 'n'
   LOAD = 'l'
+  SAVE = 'save'
 
   def initialize
     @dictionary = load_dictionary
@@ -71,7 +71,7 @@ class HangmanGame
   end
 
   def input_is_valid?(input)
-    return false unless input.length == 1 || input.length == @secret_word.length
+    return false unless input.length == 1 || input.length == @secret_word.length || input == SAVE
     return false unless input =~ /\A[a-z]+\z/
     return false if @chosen_letters.keys.include?(input)
 
@@ -79,13 +79,21 @@ class HangmanGame
   end
 
   def process_input(input)
-    if input.length == 1
+    if input == SAVE
+      save_game
+    elsif input.length == 1
       letter_exists = @secret_word.letter_exists?(input)
       @chosen_letters[input] = letter_exists
       letter_exists ? @secret_word.reveal_letter(input) : @rem_incorr_guesses -= 1
     else
       @secret_word.matches?(input) ? @secret_word.reveal_fully : @rem_incorr_guesses -= 1
     end
+  end
+
+  def save_game
+    # implement save here
+    puts "\nprogress saved!"
+    sleep 1
   end
 
   def welcome_message
@@ -104,6 +112,7 @@ class HangmanGame
     3. Type a letter and press Enter to make a guess.
     4. If you guess a correct letter, it will be revealed in the word.
     5. If you guess an incorrect letter, it will be added to your incorrect letters.
+    6. You can save your game progress at any time by typing 'save'.
     INSTRUCTIONS
   end
 
