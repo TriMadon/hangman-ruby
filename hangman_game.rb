@@ -7,6 +7,8 @@ class HangmanGame
   DICTIONARY_FILE = 'dictionary.txt'
   MAX_WORD_LEN = 12
   MIN_WORD_LEN = 5
+  NEWGAME = 'n'
+  LOAD = 'l'
 
   def initialize
     @dictionary = load_dictionary
@@ -19,11 +21,29 @@ class HangmanGame
 
   def start
     puts "let's get started!"
-    @secret_word = Word.new(random_word)
-    @rem_incorr_guesses = 7
-    @chosen_letters = {}
+    initialize_vars
     main_loop
     puts @secret_word.completed? ? win_message : loss_message
+  end
+
+  def initialize_vars
+    if user_wants_to_load?
+      load_game_from_file
+    else
+      @secret_word = Word.new(random_word)
+      @rem_incorr_guesses = 7
+      @chosen_letters = {}
+    end
+  end
+
+  def user_wants_to_load?
+    puts "\nDo you want load the game from a save file? ('y' for yes, anything else to start new game):"
+    gets.chomp.strip.downcase == 'y'
+  end
+
+  def load_game_from_file
+    # implement load here
+    puts 'loaded!'
   end
 
   def main_loop
