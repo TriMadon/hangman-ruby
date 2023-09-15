@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require './word'
+require 'io/console'
 
 class HangmanGame
   DICTIONARY_FILE = 'dictionary.txt'
@@ -35,6 +36,7 @@ class HangmanGame
     puts game_stats
     user_input = prompt_user_for_guess
     process_input(user_input)
+    $stdout.clear_screen
   end
 
   def prompt_user_for_guess
